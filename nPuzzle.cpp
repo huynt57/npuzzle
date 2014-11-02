@@ -26,6 +26,7 @@ typedef pair<int, int> PII;
 typedef unsigned long long ULL;
 typedef long long LL;
 
+
 int main() {
 	return 0;
 }
