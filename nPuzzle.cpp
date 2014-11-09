@@ -21,6 +21,7 @@
 #define DOW(i,b,a) for( int i=(b),_a=(a);i>=_a;i--)
 
 #define maxn 100
+
 using namespace std;
 
 typedef pair<int, int> PII;
@@ -37,7 +38,67 @@ struct State {
 	int g; //so buoc tu diem bat dau den trang trai
 	int h; // ham danh gia
 	int board[maxn][maxn]; //gia tri cua bang tai mot state
+	
+	void findPosOfBlankTitle(int &x, int &y) {
+		FOR(i,0, size-1) {
+			FOR(j, 0, size-1) {
+				if(board[i][j] == 0) {
+					x = i;
+					y = j;
+					break;
+				}
+			}
+		}	
+}
+
+void swap(State &nextState, int &x_blank, int &y_blank, int &x_new_pos, int &y_new_pos) {
+	nextState.board[x_blank][y_blank] = nextState.board[x_new_pos][y_new_pos];
+	nextState.board[x_new_pos][y_new_pos] = 0;
+		
+}
+
+bool moveTheBlankTitle(State &nextState, int move) {
+	int x_blank; //x of blank title
+	int y_blank; //y of blank title
+	int x_new_pos;
+	int y_new_pos;
+	nextState.findPosOfBlankTitle(x_blank, y_blank);
+	
+	if (x_blank - 1 < 0 || y_blank - 1  < 0 || x_blank + 1 > size || y_blank + 1 > size) {
+		return false;
+	}
+	
+	/*try to move
+	1 - move up
+	-1 = move down
+	2 - move right
+	-2 move left
+	*/
+	switch(move) {
+		case 1:
+			x_new_pos = x_blank - 1;
+			y_new_pos = y_blank;
+			swap(nextState, x_blank, y_blank, x_new_pos, y_new_pos);			
+		case -1:
+			x_new_pos = x_blank + 1;
+			y_new_pos = y_blank;
+			swap(nextState, x_blank, y_blank, x_new_pos, y_new_pos);
+		case 2:
+			y_new_pos = y_blank+1;
+			x_new_pos = x_blank;
+			swap(nextState, x_blank, y_blank, x_new_pos, y_new_pos);
+		case -2:
+			y_new_pos = y_blank-1;
+			x_new_pos = x_blank;
+			swap(nextState, x_blank, y_blank, x_new_pos, y_new_pos);
+	}
+			
+	return true;
+	
+}
 };
+
+vector <State> successor;
 
 void input() {
 	cin >> size;
@@ -70,6 +131,10 @@ void output()
 {
 	cout << "1";
 }
+
+void makeState() {
+	
+}
 //ham danh gia cac o khong o dung vi tri
 int h1(State nextState) {
 	int h;
@@ -92,13 +157,28 @@ int h2(State nextState) {
 			if(nextState.board[i][j] != 0) {
 				findNumberInGoalState(nextState.board[i][j], x, y);
 				h += abs(x-i) + abs(y-j);
+				break;
 			}
 		}
 	}
 	return h;	
 }
 
+
+//ham danh gia theo chim bay
 int h3(State nextState) {
+	int h;
+	int x,y; //toa do se duoc gan cho o trong goal state
+	FOR(i, 0, size - 1) {
+		FOR(j, 0, size - 1) {
+			if(nextState.board[i][j] != 0) {
+				findNumberInGoalState(nextState.board[i][j], x, y);
+				h += sqrt(pow((x-i),2)+pow((y-i),2));
+				break;
+			}
+		}
+	}
+	return h;
 }
 
 int chooseHeuristic(int h, State state) {
