@@ -33,7 +33,7 @@ int h;
 int init[maxn][maxn];
 int goal[maxn][maxn];
 int moves;
-
+vector <State> successor;
 struct State {
 	int g; //so buoc tu diem bat dau den trang trai
 	int h; // ham danh gia
@@ -98,7 +98,7 @@ bool moveTheBlankTitle(State &nextState, int move) {
 }
 };
 
-vector <State> successor;
+
 
 void input() {
 	cin >> size;
@@ -127,14 +127,19 @@ void findNumberInGoalState(int number, int &x, int &y) {
 		}
 	}
 }
+
 void output()
 {
 	cout << "1";
 }
 
-void makeState() {
-	
+void makeNextState(State &nextState, int move) {
+	if(nextState.moveTheBlankTitle(nextState, move)) {
+		successor.push_back(nextState);
+	}	
 }
+
+
 //ham danh gia cac o khong o dung vi tri
 int h1(State nextState) {
 	int h;
@@ -180,7 +185,7 @@ int h3(State nextState) {
 	}
 	return h;
 }
-
+// hàm chon hàm danh gia
 int chooseHeuristic(int h, State state) {
 	switch (h) {
 		case 1: 
