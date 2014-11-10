@@ -99,7 +99,10 @@ bool moveTheBlankTitle(State &nextState, int move) {
 
 };
 
- struct compareToState {
+State goalState;
+State initState;
+
+ struct compareTwoState {
     bool operator() (const State &state1, const State &state2) const
   	{
   		FOR(i, 0, size-1) {
@@ -112,29 +115,17 @@ bool moveTheBlankTitle(State &nextState, int move) {
   		return true;
   	}
 };
-vector <State> successor;//generated State
-State goalState;
-State initState;
-set<State, compareToState> checkDuplicateState;
-set<State>::iterator cds;
 
-
-void input() {
-	cin >> size;
-	cin >> h;
-	FOR(i, 0, size-1) {
-		FOR(j, 0, size-1) {
-			cin >> initState.board[i][j];
-		}
-	}
-	
-	FOR(i, 0, size-1) {
-		FOR(j, 0, size-1) {
-			cin >> goalState.board[i][j];
-		}
-	}
+bool compareState(State &state1, State &state2) {
+		FOR(i, 0, size-1) {
+  			FOR(j, 0, size-1) {
+  				if(state1.board[i][j] != state2.board[i][j]) {
+  					return false;
+  				}
+  			}
+  		}
+  		return true;
 }
-
 void findNumberInGoalState(int number, int &x, int &y) {
 	FOR(i, 0, size - 1) {
 		FOR(j, 0, size - 1) {
@@ -146,23 +137,6 @@ void findNumberInGoalState(int number, int &x, int &y) {
 		}
 	}
 }
-
-void output()
-{
-	cout << "1";
-}
-
-void makeNextState(State &nextState, int move) {
-	if(nextState.moveTheBlankTitle(nextState, move)) {
-		successor.push_back(nextState);
-	}
-	const bool is_in = checkDuplicateState.find(nextState) != checkDuplicateState.end();
-	if (is_in) {
-		checkDuplicateState.insert(nextState);
-	}
-}
-
-
 //ham danh gia cac o khong o dung vi tri
 int h1(State nextState) {
 	int h;
@@ -219,17 +193,77 @@ int chooseHeuristic(int h, State state) {
 			return h3(state);
 	}
 }
+struct comparePathCost
+{
+	bool operator()(const State &state1, const State &state2) const
+	{
+		return state1.g + chooseHeuristic(h, state1) > state2.g + chooseHeuristic(h, state2);
+	}
+};
+
+vector <State> successor;//generated State
+
+set<State, compareTwoState> checkDuplicateState;
+set<State>::iterator cds;
+priority_queue<State, vector<State>, comparePathCost> bestCost;
+
+
+void input() {
+	cin >> size;
+	cin >> h;
+	FOR(i, 0, size-1) {
+		FOR(j, 0, size-1) {
+			cin >> initState.board[i][j];
+		}
+	}
+	
+	FOR(i, 0, size-1) {
+		FOR(j, 0, size-1) {
+			cin >> goalState.board[i][j];
+		}
+	}
+}
+
+void output()
+{
+	cout << "1";
+}
+
+void makeNextState(State &nextState, int move) {
+	const bool is_in = checkDuplicateState.find(nextState) != checkDuplicateState.end();
+	if(nextState.moveTheBlankTitle(nextState, move)) {
+			if (is_in) {
+				checkDuplicateState.insert(nextState);
+				successor.push_back(nextState);
+				bestCost.push(nextState);
+			}
+	}
+}
+
+void addAllNextState(State &nextState)  {
+	FOR(i, -2, 2) {
+		makeNextState(nextState, i);
+	}
+}
 
 void solve() {
-	
+	while(!checkDuplicateState.empty()) {
+		State current = bestCost.top();
+		bestCost.pop();
+		if (compareState(current, goalState)) {
+			cout << current.g;
+			return;
+		} else {
+			addAllNextState(current);
+		}
+	}
 }
 
 int main() {
 	freopen("nPuzzle.inp", "r", stdin);
   	freopen("nPuzzle.out", "w", stdout);
   	input();
-  	output();
-  
+  	output();  
 	return 0;
 }
 	
