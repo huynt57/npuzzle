@@ -33,7 +33,7 @@ int h;
 int init[maxn][maxn];
 int goal[maxn][maxn];
 int moves;
-vector <State> successor;
+
 struct State {
 	int g; //so buoc tu diem bat dau den trang trai
 	int h; // ham danh gia
@@ -96,8 +96,27 @@ bool moveTheBlankTitle(State &nextState, int move) {
 	return true;
 	
 }
+
 };
 
+ struct compareToState {
+    bool operator() (const State &state1, const State &state2) const
+  	{
+  		FOR(i, 0, size-1) {
+  			FOR(j, 0, size-1) {
+  				if(state1.board[i][j] != state2.board[i][j]) {
+  					return false;
+  				}
+  			}
+  		}
+  		return true;
+  	}
+};
+vector <State> successor;//generated State
+State goalState;
+State initState;
+set<State, compareToState> checkDuplicateState;
+set<State>::iterator cds;
 
 
 void input() {
@@ -105,13 +124,13 @@ void input() {
 	cin >> h;
 	FOR(i, 0, size-1) {
 		FOR(j, 0, size-1) {
-			cin >> init[i][j];
+			cin >> initState.board[i][j];
 		}
 	}
 	
 	FOR(i, 0, size-1) {
 		FOR(j, 0, size-1) {
-			cin >> goal[i][j];
+			cin >> goalState.board[i][j];
 		}
 	}
 }
@@ -119,7 +138,7 @@ void input() {
 void findNumberInGoalState(int number, int &x, int &y) {
 	FOR(i, 0, size - 1) {
 		FOR(j, 0, size - 1) {
-			if(goal[i][j] == number) {
+			if(goalState.board[i][j] == number) {
 				x = i;
 				y = j;
 				break;
@@ -136,7 +155,11 @@ void output()
 void makeNextState(State &nextState, int move) {
 	if(nextState.moveTheBlankTitle(nextState, move)) {
 		successor.push_back(nextState);
-	}	
+	}
+	const bool is_in = checkDuplicateState.find(nextState) != checkDuplicateState.end();
+	if (is_in) {
+		checkDuplicateState.insert(nextState);
+	}
 }
 
 
@@ -145,7 +168,7 @@ int h1(State nextState) {
 	int h;
 	FOR(i, 0, size - 1) {
 		FOR(j, 0, size - 1) {
-			if((nextState.board[i][j] != goal[i][j]) && nextState.board[i][j] != 0) {
+			if((nextState.board[i][j] != goalState.board[i][j]) && nextState.board[i][j] != 0) {
 				h++;
 			}
 		}
