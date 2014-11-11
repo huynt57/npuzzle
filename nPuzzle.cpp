@@ -54,6 +54,7 @@ struct State {
 void swap(State &nextState, int &x_blank, int &y_blank, int &x_new_pos, int &y_new_pos) {
 	nextState.board[x_blank][y_blank] = nextState.board[x_new_pos][y_new_pos];
 	nextState.board[x_new_pos][y_new_pos] = 0;
+	nextState.g++;
 		
 }
 
@@ -247,7 +248,7 @@ void addAllNextState(State &nextState)  {
 }
 
 void solve() {
-	while(!checkDuplicateState.empty()) {
+	while(!bestCost.empty()) {
 		State current = bestCost.top();
 		bestCost.pop();
 		if (compareState(current, goalState)) {
@@ -263,6 +264,7 @@ int main() {
 	freopen("nPuzzle.inp", "r", stdin);
   	freopen("nPuzzle.out", "w", stdout);
   	input();
+  	solve();
   	output();  
 	return 0;
 }
