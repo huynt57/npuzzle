@@ -72,11 +72,6 @@ struct State {
         int x_new_pos;
         int y_new_pos;
         nextState.findPosOfBlankTitle(x_blank, y_blank);
-
-
-        //if (x_blank - 1 < 0 || y_blank - 1  < 0 || x_blank + 1 > size || y_blank + 1 > size) {
-        //		return false;
-
         /*try to move
 //	}
         1 - move up
@@ -104,24 +99,11 @@ struct State {
             case 0:
                 return false;
         }
-        //cout << x_blank << " " << y_blank << endl;
-        //cout << x_new_pos << " " << y_new_pos << endl;
-        //	FOR(i, 0, size-1)
-        //		FOR(j, 0, size-1) {
-        //			cout << nextState.board[i][j];
-        //		}
-        //		cout << endl;
         if (x_new_pos < 0 || y_new_pos < 0 || x_new_pos >= size || y_new_pos >= size) {
             return false;
         } else {
             swap(nextState, x_blank, y_blank, x_new_pos, y_new_pos);
         }
-        //FOR(i, 0, size-1)
-        //		FOR(j, 0, size-1) {
-        //			cout << nextState.board[i][j];
-        //		}
-        //		cout << endl;
-
         return true;
     }
 
@@ -131,11 +113,8 @@ State goalState;
 State initState;
 
 struct compareTwoState {
-
     bool operator() (const State &state1, const State &state2) const {
-
-        FOR(i, 0, size - 1) {
-
+       FOR(i, 0, size - 1) {
             FOR(j, 0, size - 1) {
                 if (state1.board[i][j] > state2.board[i][j]) {
                     return false;
@@ -149,7 +128,6 @@ struct compareTwoState {
 };
 
 bool compareState(State &state1, State &state2) {
-
     FOR(i, 0, size - 1) {
 
         FOR(j, 0, size - 1) {
@@ -162,7 +140,6 @@ bool compareState(State &state1, State &state2) {
 }
 
 void findNumberInGoalState(int number, int &x, int &y) {
-
     FOR(i, 0, size - 1) {
 
         FOR(j, 0, size - 1) {
@@ -178,7 +155,6 @@ void findNumberInGoalState(int number, int &x, int &y) {
 
 int h1(State nextState) {
     int h = 0;
-
     FOR(i, 0, size - 1) {
 
         FOR(j, 0, size - 1) {
@@ -195,7 +171,6 @@ int h1(State nextState) {
 int h2(State nextState) {
     int h = 0;
     int x, y; //toa do se duoc gan cho o trong goal state
-
     FOR(i, 0, size - 1) {
 
         FOR(j, 0, size - 1) {
@@ -214,9 +189,7 @@ int h2(State nextState) {
 int h3(State nextState) {
     int h = 0;
     int x, y; //toa do se duoc gan cho o trong goal state
-
     FOR(i, 0, size - 1) {
-
         FOR(j, 0, size - 1) {
             if (nextState.board[i][j] != 0) {
                 findNumberInGoalState(nextState.board[i][j], x, y);
@@ -246,9 +219,7 @@ struct comparePathCost {
     }
 };
 
-
 vector <State> successor; //generated State
-
 set<State, compareTwoState> checkDuplicateState;
 set<State>::iterator cds;
 priority_queue<State, vector<State>, comparePathCost> bestCost;
@@ -272,58 +243,14 @@ void input() {
     }
 }
 
-void printState(State state) {
-
-    FOR(i, 0, size - 1) {
-        FOR(j, 0, size - 1)
-        cout << state.board[i][j] << " ";
-        cout << endl;
-    }
-    cout << state.g << endl;
-}
-
-void printSet() {
-    cout << "----------------\n";
-    for (cds = checkDuplicateState.begin(); cds != checkDuplicateState.end(); ++cds) {
-        printState(*cds);
-    }
-    cout << "----------------\n";
-}
-
-bool check2(State &s1, State s2) {
-
-    FOR(i, 0, size - 1) {
-
-        FOR(j, 0, size - 1) {
-            if (s1.board[i][j] != s2.board[i][j]) {
-                return false;
-            }
-        }
-    }
-    return true;
-}
-
-bool check(State state) {
-    for (cds = checkDuplicateState.begin(); cds != checkDuplicateState.end(); ++cds) {
-        if (check2(state, *cds))
-            return true;
-    }
-    return false;
-}
-
 void makeNextState(State nextState, int move) {
-    //	printState(nextState);
     if (nextState.moveTheBlankTitle(nextState, move)) {
-
         const bool is_in = checkDuplicateState.find(nextState) != checkDuplicateState.end();
-        //	bool is_in = check(nextState);
-        //	cout << is_in << endl;
         if (!is_in) {
-            //	cout << "2";
-            //		printState(nextState);
             checkDuplicateState.insert(nextState);
             successor.push_back(nextState);
             bestCost.push(nextState);
+            moves++;
         }
     }
 }
@@ -335,21 +262,14 @@ void addInitState() {
 }
 
 void addAllNextState(State &nextState) {
-    //	printSet();
-    //	printState(nextState);
-
     FOR(i, -2, 2) {
         makeNextState(nextState, i);
-        //	cout << endl;
     }
-    //	cout << endl;
 }
 
 int solve() {
-    //cout << "2";
     addInitState();
     while (!bestCost.empty()) {
-        //	cout << "2";
         State current = bestCost.top();
         bestCost.pop();
         if (compareState(current, goalState)) {
@@ -362,12 +282,16 @@ int solve() {
     return -1;
 }
 
+void output() {
+	cout << moves;
+}
+
 int main() {
     freopen("nPuzzle.inp", "r", stdin);
     freopen("nPuzzle.out", "w", stdout);
-    input();
+    input(); 
     solve();
-    cout << checkDuplicateState.size();
+    output();
     return 0;
 }
 
