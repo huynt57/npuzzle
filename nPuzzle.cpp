@@ -1,3 +1,15 @@
+/** 
+*   University of Engineering and Technology
+*	
+*	AI Assignment 
+*   Student: Nguyen The Huy
+*   Class: K57CA
+*   
+*   Program: nPuzzle
+*   Desciption: This program uses A-star algorithm to solve nPuzlle problems
+*   with 3 heuristic functions (see below for more details)      
+*/
+
 #include <cstdio>
 #include <cstring>
 #include <vector>
@@ -20,24 +32,27 @@
 #define FOR(i,a,b) for( int i=(a),_b=(b);i<=_b;i++)
 #define DOW(i,b,a) for( int i=(b),_a=(a);i>=_a;i--)
 
-#define maxn 100
-#define bignum 1000000
+#define maxn 100/* Define the init size of board */
 
 using namespace std;
 
-typedef pair<int, int> PII;
-typedef unsigned long long ULL;
-typedef long long LL;
+int size; /* Size of board*/
+int h;/* Which heuristic function will be choose to solve problem*/
+int moves;/* Number of Optimal code*/
 
-int size;
-int h;
-int moves;
-
+/* 
+ *  Struct:  State
+ *  Description:  A puzzle state with properties: g, heu, and board 
+ *  see below for more details
+ */
 struct State {
-    int g; //so buoc tu diem bat dau den trang trai
-    int heu; // ham danh gia
-    int board[maxn][maxn]; //gia tri cua bang tai mot state
+    int g; //the number from init state to current state
+    int board[maxn][maxn]; //Store the numbers in a state
 
+/* 
+ *  Function:  findPosOfBlankTitle
+ *  Description:  Find the coordinates of blank tile in a state
+ */
     void findPosOfBlankTitle(int &x, int &y) {
 
         FOR(i, 0, size - 1) {
@@ -51,29 +66,37 @@ struct State {
             }
         }
     }
-
-    State() {
-        g = 0;
-        h = 1000000;
-        memset(board, 0, sizeof (board[0][0]) * maxn * maxn);
-    }
-
+/* 
+ *  End of function:  findPosOfBlankTitle 
+ */
+ 
+ /* 
+ *  Function:  swap
+ *  Description:  Swap between blank tile and a specific tile
+ */
+ 
     void swap(State &nextState, int &x_blank, int &y_blank, int &x_new_pos, int &y_new_pos) {
-        //	cout << "22";
         nextState.board[x_blank][y_blank] = nextState.board[x_new_pos][y_new_pos];
         nextState.board[x_new_pos][y_new_pos] = 0;
         nextState.g++;
 
     }
+/* 
+ *  End of function:  swap 
+ */
 
-    bool moveTheBlankTitle(State &nextState, int move) {
+/* 
+ *  Function:  moveTheBlankTile
+ *  Description:  move the blank title to 4 directions. Return false if cannot 
+ *	move, true if success
+ */
+    bool moveTheBlankTile(State &nextState, int move) {
         int x_blank; //x of blank title
         int y_blank; //y of blank title
         int x_new_pos;
         int y_new_pos;
         nextState.findPosOfBlankTitle(x_blank, y_blank);
         /*try to move
-//	}
         1 - move up
         -1 = move down
         2 - move right
@@ -81,7 +104,7 @@ struct State {
          */
         switch (move) {
             case 1:
-                x_new_pos = x_blank - 1;
+                x_new_pos = x_blank - 1; 
                 y_new_pos = y_blank;
                 break;
             case -1:
@@ -106,13 +129,22 @@ struct State {
         }
         return true;
     }
-
+/* 
+ *  End of function:  moveTheBlankTile 
+ */
 };
+/* 
+ *  End of struct:  state 
+ */
 
-State goalState;
-State initState;
+State goalState;	// Store goal State
+State initState; 	// Store init State
 
-struct compareTwoState {
+/* 
+ *  Struct:  compareTwoStateInSet
+ *  Description:  compare two state to use data structure set in C++. 
+ */
+struct compareTwoStateInSet {
     bool operator() (const State &state1, const State &state2) const {
        FOR(i, 0, size - 1) {
             FOR(j, 0, size - 1) {
@@ -126,7 +158,15 @@ struct compareTwoState {
         return false;
     }
 };
-
+/* 
+ *  End of struct:  compareTwoState 
+ */
+ 
+/* 
+ *  Function:  compareState
+ *  Description:  compare two state. Return true if the same board, false in 
+ *	others
+ */ 
 bool compareState(State &state1, State &state2) {
     FOR(i, 0, size - 1) {
 
@@ -138,7 +178,14 @@ bool compareState(State &state1, State &state2) {
     }
     return true;
 }
+/* 
+ *  End of function:  compareState 
+ */
 
+/* 
+ *  Function:  findNumberInGoalState
+ *  Description:  Find a specific number in goal state
+ */ 
 void findNumberInGoalState(int number, int &x, int &y) {
     FOR(i, 0, size - 1) {
 
@@ -151,8 +198,14 @@ void findNumberInGoalState(int number, int &x, int &y) {
         }
     }
 }
-//ham danh gia cac o khong o dung vi tri
-
+/* 
+ *  End of function:  findNumberInGoalState 
+ */
+ 
+/* 
+ *  Function:  h1
+ *  Description:  Calculate heuristic = the number of misplaced tiles
+ */
 int h1(State nextState) {
     int h = 0;
     FOR(i, 0, size - 1) {
@@ -165,9 +218,15 @@ int h1(State nextState) {
     }
     return h;
 }
+/* 
+ *  End of function:  h1
+ */
 
-//ham danh gia manhatan
-
+/* 
+ *  Function:  h2
+ *  Description:  Calculate heuristic = the sum of the distances of the tiles
+ *  from their goal positions
+ */
 int h2(State nextState) {
     int h = 0;
     int x, y; //toa do se duoc gan cho o trong goal state
@@ -182,10 +241,14 @@ int h2(State nextState) {
     }
     return h;
 }
+/* 
+ *  End of function:  h2
+ */
 
-
-//ham danh gia theo chim bay
-
+/* 
+ *  Function:  h3
+ *  Description:  Calculate heuristic = the flying distance
+ */
 int h3(State nextState) {
     int h = 0;
     int x, y; //toa do se duoc gan cho o trong goal state
@@ -199,7 +262,14 @@ int h3(State nextState) {
     }
     return h;
 }
-// hàm chon hàm danh gia
+/* 
+ *  End of function:  h3
+ */
+ 
+/* 
+ *  Function:  chooseHeuristic
+ *  Description:  Choose the heuristic function from input h
+ */
 
 int chooseHeuristic(int h, State state) {
     switch (h) {
@@ -211,19 +281,33 @@ int chooseHeuristic(int h, State state) {
             return h3(state);
     }
 }
-
+/* 
+ *  End of function:  chooseHeuristic
+ */
+ 
+/* 
+ *  Struct:  comparePathCost
+ *  Description:  Compare f = g + h of two state for data structure priority queue
+ *	in c++
+ */ 
 struct comparePathCost {
 
     bool operator()(const State &state1, const State &state2) const {
         return state1.g + chooseHeuristic(h, state1) > state2.g + chooseHeuristic(h, state2);
     }
 };
+/* 
+ *  End of struct:  comparePathCost
+ */
+ 
+set<State, compareTwoStateInSet> checkDuplicateState; // a set to store generated state and check duplicate state
+set<State>::iterator cds; // iterator for set
+priority_queue<State, vector<State>, comparePathCost> bestCost; //priority queue to find out the best path cost of states
 
-vector <State> successor; //generated State
-set<State, compareTwoState> checkDuplicateState;
-set<State>::iterator cds;
-priority_queue<State, vector<State>, comparePathCost> bestCost;
-
+/* 
+ *  Function:  input
+ *  Description:  Read size of npuzzle, heuristic function, goal and init state
+ */
 void input() {
     cin >> size;
     cin >> h;
@@ -242,31 +326,58 @@ void input() {
         }
     }
 }
+/* 
+ *  End of funtion:  input
+ */
 
+/* 
+ *  Function:  makeNextState
+ *  Description:  make next state of a state by move the blank tile. Also check the
+ *	duplicate state: if no duplicate, insert to set and priority queue
+ */
 void makeNextState(State nextState, int move) {
-    if (nextState.moveTheBlankTitle(nextState, move)) {
+    if (nextState.moveTheBlankTile(nextState, move)) {
         const bool is_in = checkDuplicateState.find(nextState) != checkDuplicateState.end();
         if (!is_in) {
             checkDuplicateState.insert(nextState);
-            successor.push_back(nextState);
             bestCost.push(nextState);
             moves++;
         }
     }
 }
+/* 
+ *  End of funtion:  makeNextState
+ */
 
+/* 
+ *  Function:  addInitState
+ *  Description:  Add init state to set and priority queue
+ */
 void addInitState() {
     checkDuplicateState.insert(initState);
-    successor.push_back(initState);
     bestCost.push(initState);
 }
+/* 
+ *  End of funtion:  addInitState
+ */
 
+/* 
+ *  Function:  addAllNextState
+ *  Description:  make next state in 4 directions
+ */
 void addAllNextState(State &nextState) {
     FOR(i, -2, 2) {
         makeNextState(nextState, i);
     }
 }
+/* 
+ *  End of funtion:  addAllNextState
+ */
 
+/* 
+ *  Function:  solve
+ *  Description:  solve npuzzle problem by A* search
+ */
 int solve() {
     addInitState();
     while (!bestCost.empty()) {
@@ -281,11 +392,25 @@ int solve() {
     }
     return -1;
 }
+/* 
+ *  End of funtion:  solve
+ */
 
+/* 
+ *  Function:  output
+ *  Description:  Print out the number of optimal move
+ */
 void output() {
 	cout << moves;
 }
+/* 
+ *  End of funtion:  output
+ */
 
+/* 
+ *  Function:  main
+ *  Description:  Run above function
+ */
 int main() {
     freopen("nPuzzle.inp", "r", stdin);
     freopen("nPuzzle.out", "w", stdout);
@@ -294,4 +419,7 @@ int main() {
     output();
     return 0;
 }
+/* 
+ *  End of funtion:  main
+ */
 
