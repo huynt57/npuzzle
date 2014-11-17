@@ -169,7 +169,6 @@ struct compareTwoStateInSet {
  */ 
 bool compareState(State &state1, State &state2) {
     FOR(i, 0, size - 1) {
-
         FOR(j, 0, size - 1) {
             if (state1.board[i][j] != state2.board[i][j]) {
                 return false;
@@ -188,7 +187,6 @@ bool compareState(State &state1, State &state2) {
  */ 
 void findNumberInGoalState(int number, int &x, int &y) {
     FOR(i, 0, size - 1) {
-
         FOR(j, 0, size - 1) {
             if (goalState.board[i][j] == number) {
                 x = i;
@@ -209,7 +207,6 @@ void findNumberInGoalState(int number, int &x, int &y) {
 int h1(State nextState) {
     int h = 0;
     FOR(i, 0, size - 1) {
-
         FOR(j, 0, size - 1) {
             if ((nextState.board[i][j] != goalState.board[i][j]) && nextState.board[i][j] != 0) {
                 h++;
@@ -231,7 +228,6 @@ int h2(State nextState) {
     int h = 0;
     int x, y; //toa do se duoc gan cho o trong goal state
     FOR(i, 0, size - 1) {
-
         FOR(j, 0, size - 1) {
             if (nextState.board[i][j] != 0) {
                 findNumberInGoalState(nextState.board[i][j], x, y);
@@ -291,7 +287,6 @@ int chooseHeuristic(int h, State state) {
  *	in c++
  */ 
 struct comparePathCost {
-
     bool operator()(const State &state1, const State &state2) const {
         return state1.g + chooseHeuristic(h, state1) > state2.g + chooseHeuristic(h, state2);
     }
@@ -313,14 +308,12 @@ void input() {
     cin >> h;
 
     FOR(i, 0, size - 1) {
-
         FOR(j, 0, size - 1) {
             cin >> initState.board[i][j];
         }
     }
 
     FOR(i, 0, size - 1) {
-
         FOR(j, 0, size - 1) {
             cin >> goalState.board[i][j];
         }
