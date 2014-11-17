@@ -284,11 +284,15 @@ int chooseHeuristic(int h, State state) {
 /* 
  *  Struct:  comparePathCost
  *  Description:  Compare f = g + h of two state for data structure priority queue
- *	in c++
+ *	in c++. If same f, we compare h because less h means better
  */ 
 struct comparePathCost {
     bool operator()(const State &state1, const State &state2) const {
-        return state1.g + chooseHeuristic(h, state1) > state2.g + chooseHeuristic(h, state2);
+        if (state1.g + chooseHeuristic(h, state1) == state2.g + chooseHeuristic(h, state2)){
+         	return (state1.g < state2.g);//compare g is better than recalculate h
+    	} else {
+        	return (state1.g + chooseHeuristic(h, state1) > state2.g + chooseHeuristic(h, state2));
+     	}
     }
 };
 /* 
