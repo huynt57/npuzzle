@@ -38,7 +38,7 @@ using namespace std;
 
 int size; /* Size of board*/
 int h;/* Which heuristic function will be choose to solve problem*/
-int moves;/* Number of Optimal code*/
+int stateGenerated;/* Number of state generated*/
 
 /* 
  *  Struct:  State
@@ -338,7 +338,7 @@ void makeNextState(State nextState, int move) {
         if (!is_in) {
             checkDuplicateState.insert(nextState);
             bestCost.push(nextState);
-            moves++;
+            stateGenerated++;
         }
     }
 }
@@ -397,7 +397,7 @@ int solve() {
  *  Description:  Print out the number of optimal move
  */
 void output() {
-	cout << moves;
+	cout << stateGenerated;
 }
 /* 
  *  End of funtion:  output
