@@ -394,7 +394,7 @@ int solve() {
 
 /* 
  *  Function:  output
- *  Description:  Print out the number of optimal move
+ *  Description:  Print out the number of state generated
  */
 void output() {
 	cout << stateGenerated;
