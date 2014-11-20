@@ -381,8 +381,7 @@ int solve() {
         State current = bestCost.top();
         bestCost.pop();
         if (compareState(current, goalState)) {
-            cout << current.g << " ";
-            return 0;
+            return current.g;
         } else {
             addAllNextState(current);
         }
@@ -412,7 +411,7 @@ int main() {
     freopen("nPuzzle.inp", "r", stdin);
     freopen("nPuzzle.out", "w", stdout);
     input(); 
-    solve();
+    cout << solve() << " ";
     output();
     return 0;
 }
