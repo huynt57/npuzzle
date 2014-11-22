@@ -300,7 +300,6 @@ struct comparePathCost {
  */
  
 set<State, compareTwoStateInSet> checkDuplicateState; // a set to store generated state and check duplicate state
-set<State>::iterator cds; // iterator for set
 priority_queue<State, vector<State>, comparePathCost> bestCost; //priority queue to find out the best path cost of states
 
 /* 
@@ -357,6 +356,42 @@ void addInitState() {
 /* 
  *  End of funtion:  addInitState
  */
+ 
+/* 
+ *  Function:  checkInitState
+ *  Description:  Check if initState
+ */
+bool checkInitState() {
+	vector <int> check;
+	
+	int inverse = 0;
+	int x_blank = 0;
+	int y_blank = 0;
+	
+	initState.findPosOfBlankTitle(x_blank, y_blank);
+	
+	FOR(i, 0, size-1) {
+		FOR(j, 0, size-1) {
+			check.push_back(initState.board[i][j]);
+		}
+	}
+	
+	FOR(i,0, check.size()) {
+		FOR(j, i+1, check.size()-1) {
+			if(check[j] > check[i]) 	inverse++;
+		}
+	}
+	
+	if(size%2!=0) {
+		if (inverse%2==0) {
+			return true;
+		}
+	} else {
+		if (inverse%2==0 && x_blank%2==0) return true;
+		else if (inverse%2==1&&x_blank%2==0) return true;
+	}
+	return false;		
+}
 
 /* 
  *  Function:  addAllNextState
@@ -377,15 +412,17 @@ void addAllNextState(State &nextState) {
  */
 int solve() {
     addInitState();
-    while (!bestCost.empty()) {
-        State current = bestCost.top();
-        bestCost.pop();
-        if (compareState(current, goalState)) {
-            return current.g;
-        } else {
-            addAllNextState(current);
-        }
-    }
+   // if(checkInitState()) {
+	    while (!bestCost.empty()) {
+	        State current = bestCost.top();
+	        bestCost.pop();
+	        if (compareState(current, goalState)) {
+	            return current.g;
+	        } else {
+	            addAllNextState(current);
+	        }
+	    }
+//	}
     return -1;
 }
 /* 
