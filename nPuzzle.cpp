@@ -32,7 +32,7 @@
 #define FOR(i,a,b) for( int i=(a),_b=(b);i<=_b;i++)
 #define DOW(i,b,a) for( int i=(b),_a=(a);i>=_a;i--)
 
-#define maxn 20/* Define the init size of board */
+#define maxn 10/* Define the init size of board */
 
 using namespace std;
 
