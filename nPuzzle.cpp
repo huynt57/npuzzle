@@ -444,6 +444,7 @@ void output() {
  *  Function:  main
  *  Description:  Run above function
  */
+ 
 int main() {
     freopen("nPuzzle.inp", "r", stdin);
     freopen("nPuzzle.out", "w", stdout);
