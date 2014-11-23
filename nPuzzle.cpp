@@ -327,17 +327,44 @@ void input() {
  */
 
 /* 
+ *  Struct:  findState
+ *  Description:  Compare two state in set. False if 2 states are different
+ */
+struct findState {
+    findState(const State &s): s(s){}
+    bool operator()(const State & s2) {
+        FOR(i, 0, size - 1) {
+        	FOR(j, 0, size - 1) {
+            if (s.board[i][j] != s2.board[i][j]) {             
+                return false;
+            }
+        }
+    }
+    return true;
+}
+private:
+    State s;
+};
+
+/* 
  *  Function:  makeNextState
  *  Description:  make next state of a state by move the blank tile. Also check the
- *	duplicate state: if no duplicate, insert to set and priority queue
+ *	duplicate state: if same state, compare g, insert to set and priority queue
  */
 void makeNextState(State nextState, int move) {
     if (nextState.moveTheBlankTile(nextState, move)) {
+    	std::set<State>::iterator foundState = std::find_if(checkDuplicateState.begin(), checkDuplicateState.end(), findState(nextState));
         const bool is_in = checkDuplicateState.find(nextState) != checkDuplicateState.end();
         if (!is_in) {
             checkDuplicateState.insert(nextState);
             bestCost.push(nextState);
             stateGenerated++;
+        } else {
+        	if (nextState.g < foundState->g) {
+        		checkDuplicateState.insert(nextState);
+           		bestCost.push(nextState);
+            	stateGenerated++;
+        	}
         }
     }
 }
@@ -358,41 +385,46 @@ void addInitState() {
  */
  
 /* 
- *  Function:  checkInitState
- *  Description:  Check if initState
+ *  Function:  checkState
+ *  Description:  Check if a State solvable for goal state has blank tile on
+ * 	down right
  */
-bool checkInitState() {
+bool checkState(State state) {
 	vector <int> check;
 	
 	int inverse = 0;
 	int x_blank = 0;
 	int y_blank = 0;
 	
-	initState.findPosOfBlankTitle(x_blank, y_blank);
+	state.findPosOfBlankTitle(x_blank, y_blank);
 	
 	FOR(i, 0, size-1) {
 		FOR(j, 0, size-1) {
-			check.push_back(initState.board[i][j]);
+			if (state.board[i][j] != 0) 
+				check.push_back(state.board[i][j]);
 		}
 	}
-	
-	FOR(i,0, check.size()) {
-		FOR(j, i+1, check.size()-1) {
-			if(check[j] > check[i]) 	inverse++;
+
+	FOR(i,0, check.size()-1) {
+		FOR(j, i+1, check.size()) {
+			if(check[j] < check[i]) 	inverse++;
 		}
 	}
-	
+
 	if(size%2!=0) {
 		if (inverse%2==0) {
 			return true;
 		}
 	} else {
-		if (inverse%2==0 && x_blank%2==0) return true;
+		if (inverse%2==0 && x_blank%2==1) return true;
 		else if (inverse%2==1&&x_blank%2==0) return true;
 	}
 	return false;		
 }
-
+/* 
+ *  End of funtion:  checkState
+ */
+ 
 /* 
  *  Function:  addAllNextState
  *  Description:  make next state in 4 directions
@@ -405,14 +437,27 @@ void addAllNextState(State &nextState) {
 /* 
  *  End of funtion:  addAllNextState
  */
-
+ 
+/* 
+ *  Function:  checkInitAndGoalState
+ *  Description:  if goal and init state are solvable, return true. Else, return
+ * 	false
+ */
+bool checkInitAndGoalState() {
+	if(checkState(initState) == checkState(goalState)) return true;
+	return false;
+}
+/* 
+ *  End of funtion:  checkInitAndGoalState
+ */
+ 
 /* 
  *  Function:  solve
  *  Description:  solve npuzzle problem by A* search
  */
 int solve() {
     addInitState();
-   // if(checkInitState()) {
+    if(checkInitAndGoalState()) {
 	    while (!bestCost.empty()) {
 	        State current = bestCost.top();
 	        bestCost.pop();
@@ -422,7 +467,7 @@ int solve() {
 	            addAllNextState(current);
 	        }
 	    }
-//	}
+	}
     return -1;
 }
 /* 
