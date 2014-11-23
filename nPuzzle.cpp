@@ -337,11 +337,11 @@ struct findState {
         	FOR(j, 0, size - 1) {
             if (s.board[i][j] != s2.board[i][j]) {             
                 return false;
-            }
-        }
-    }
+            	}
+        	}
+    	}
     return true;
-}
+	}
 private:
     State s;
 };
