@@ -252,7 +252,7 @@ int h3(State nextState) {
         FOR(j, 0, size - 1) {
             if (nextState.board[i][j] != 0) {
                 findNumberInGoalState(nextState.board[i][j], x, y);
-                h += sqrt(pow((x - i), 2) + pow((y - i), 2));
+                h += sqrt(pow((x - i), 2) + pow((y - j), 2));
             }
         }
     }
