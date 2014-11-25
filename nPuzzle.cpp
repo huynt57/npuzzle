@@ -333,6 +333,7 @@ void makeNextState(State nextState, int move) {
             stateGenerated++;
         } else {
         	if (checkDuplicateState.find(nextState)->g > nextState.g) {
+        		checkDuplicateState.erase(checkDuplicateState.find(nextState));
         		checkDuplicateState.insert(nextState);
            		bestCost.push(nextState);
             	stateGenerated++;
