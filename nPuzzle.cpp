@@ -13,26 +13,19 @@
 #include <cstdio>
 #include <cstring>
 #include <vector>
-#include <list>
-#include <map>
 #include <set>
-#include <deque>
-#include <stack>
-#include <bitset>
 #include <algorithm>
-#include <sstream>
 #include <fstream>
 #include <iostream>
 #include <cmath>
 #include <cstdlib>
-#include <ctime>
 #include <queue>
 #include <string>
 
 #define FOR(i,a,b) for( int i=(a),_b=(b);i<=_b;i++)
 #define DOW(i,b,a) for( int i=(b),_a=(a);i>=_a;i--)
 
-#define maxn 10/* Define the init size of board */
+#define maxn 8/* Define the init size of board */
 
 using namespace std;
 
