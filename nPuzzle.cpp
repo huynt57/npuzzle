@@ -293,6 +293,7 @@ struct comparePathCost {
  */
 
 set<State, compareTwoStateInSet> checkDuplicateState; // a set to store generated state and check duplicate state
+set<State, compareTwoStateInSet>::iterator ite; //iterator for set
 priority_queue<State, vector<State>, comparePathCost> bestCost; //priority queue to find out the best path cost of states
 
 /*
@@ -326,14 +327,15 @@ void input() {
  */
 void makeNextState(State nextState, int move) {
     if (nextState.moveTheBlankTile(nextState, move)) {
-        const bool is_in = checkDuplicateState.find(nextState) != checkDuplicateState.end();
+    	ite = checkDuplicateState.find(nextState);
+        const bool is_in = ite != checkDuplicateState.end();
         if (!is_in) {
             checkDuplicateState.insert(nextState);
             bestCost.push(nextState);
             stateGenerated++;
         } else {
-        	if (checkDuplicateState.find(nextState)->g > nextState.g) {
-        		checkDuplicateState.erase(checkDuplicateState.find(nextState));
+        	if (ite->g > nextState.g) {
+        		checkDuplicateState.erase(ite);
         		checkDuplicateState.insert(nextState);
            		bestCost.push(nextState);
             	stateGenerated++;

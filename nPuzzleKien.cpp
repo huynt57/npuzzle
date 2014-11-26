@@ -29,7 +29,7 @@ struct State{
 	int nPuzzle;// store size of state array
 	
 /* 
- *  Function:  Constructor
+ *  Function: Constructor
  *  Description: to set depth and f function of new states to 0
  */
 	State(){
@@ -37,7 +37,39 @@ struct State{
 		f_function = 0;
 	}
 /* 
- *  End of function:  Constructor
+ *  End of function: Constructor
+ */
+ 
+/* 
+ *  Function: Constructor
+ *  Description: to set depth, f function of new states to 0 and nPuzzle, state array to n and state1 array
+ */
+ 	State(int n, int state1[][5]){
+ 		nPuzzle = n;
+ 		depth = 0;
+ 		f_function = 0;
+ 		for(int i=0; i<n; i++)
+			for(int j=0; j<n; j++)
+				state[i][j]=state1[i][j];
+ 	}
+/* 
+ *  End of function: Constructor
+ */
+ 
+/* 
+ *  Function: Copy Constructor
+ *  Description: to copy a new state with a given state
+ */
+	State(const State &copy){
+		nPuzzle = copy.nPuzzle;
+		depth = copy.depth;
+		f_function = copy.f_function;
+		for(int i=0; i<nPuzzle; i++)
+			for(int j=0; j<nPuzzle; j++)
+				state[i][j]=copy.state[i][j];
+	}
+/* 
+ *  End of function: Copy Constructor
  */
  
 /* 
@@ -65,58 +97,39 @@ struct State{
 /* 
  *  End of function: checkMove
  */
- 
-/* 
- *  Function: copyState
- *  Description: to copy state array in a given instance of State Struct to a given array
- */	
-	void copyState(int state1[][5]){
-		for(int i=0; i<nPuzzle; i++)
-			for(int j=0; j<nPuzzle; j++){
-				this->state[i][j]=state1[i][j];
-			}
-	}
-/* 
- *  End of function: copyState
- */
-};
 
 /* 
  *  Function: move
  *  Description: to operate function to move the blank space to left, right, down or up if check return true
  */	
-void move(State &state1,int type){
-	state1.depth++;
-	
-	for(int i=0; i<state1.nPuzzle; i++)
-		for(int j=0; j<state1.nPuzzle; j++){
-			if(type == 0){
-				if(!state1.checkMove(0)) return;
-				if(state1.state[i][j]==0 && i<state1.nPuzzle-1){
-					swap(state1.state[i][j], state1.state[i+1][j]);
-					return;
-				}
-			} else if(type == 1){
-				if(!state1.checkMove(1)) return;
-				if(state1.state[i][j]==0 && i>0){
-					swap(state1.state[i][j], state1.state[i-1][j]);
-					return;
-				}
-			} else if(type == 2){
-				if(!state1.checkMove(2)) return;
-				if(state1.state[i][j]==0 && j>0){
-					swap(state1.state[i][j], state1.state[i][j-1]);
-					return;
-				}
-			} else if(type == 3){
-				if(!state1.checkMove(3)) return;
-				if(state1.state[i][j]==0 && j<state1.nPuzzle-1){
-					swap(state1.state[i][j], state1.state[i][j+1]);
-					return;
+	void move(int type){
+		depth++;
+		
+		for(int i=0; i<nPuzzle; i++)
+			for(int j=0; j<nPuzzle; j++){
+				if(type == 0){
+					if(state[i][j]==0 && i<nPuzzle-1){
+						swap(state[i][j], state[i+1][j]);
+						return;
+					}
+				} else if(type == 1){
+					if(state[i][j]==0 && i>0){
+						swap(state[i][j], state[i-1][j]);
+						return;
+					}
+				} else if(type == 2){
+					if(state[i][j]==0 && j>0){
+						swap(state[i][j], state[i][j-1]);
+						return;
+					}
+				} else if(type == 3){
+					if(state[i][j]==0 && j<nPuzzle-1){
+						swap(state[i][j], state[i][j+1]);
+						return;
+					}
 				}
 			}
-		}
-}
+	}
 /* 
  *  End of function: move
  */
@@ -125,34 +138,20 @@ void move(State &state1,int type){
  *  Function: checkState
  *  Description: to check whether two given instances of State Struct contain the same state array
  */	
-bool checkState(const State &state1, const State &state2){
-	for(int i=0; i<state1.nPuzzle; i++)
-		for(int j=0; j<state1.nPuzzle; j++){
-			if(state1.state[i][j]!=state2.state[i][j]) return false;
-		}
-	
-	return true;
-}
+	bool checkState(const State &state1){
+		for(int i=0; i<nPuzzle; i++)
+			for(int j=0; j<nPuzzle; j++){
+				if(state[i][j]!=state1.state[i][j]) return false;
+			}
+		
+		return true;
+	}
 /* 
  *  End of function: checkState
  */
- 
+};
 /* 
- *  Function: copy
- *  Description: to copy properties of an instance of State Struct to another one
- */	
-void copy(State &state1,const State &state2){
-	for(int i=0; i<state2.nPuzzle; i++)
-		for(int j=0; j<state2.nPuzzle; j++){
-			state1.state[i][j]=state2.state[i][j];
-		}
-		
-	state1.depth = state2.depth;
-	state1.nPuzzle = state2.nPuzzle;
-	state1.f_function = state2.f_function;
-}
-/* 
- *  End of function: copy
+ *  End of struct: State
  */
  
 /* 
@@ -319,20 +318,20 @@ int mis_column_row(int input[][5], int output[][5], int nPuzzle){
 
 priority_queue<State, vector<State>, compPathCost> L; // a heap to store generated states to decide which state should be expanded next
 set<State, compState> S; // a binary search tree to store generated states to check and avoid repeated states
-
+set<State, compState>::iterator it; // an iterator to point to a state in set S
 /* 
  *  Function: generatedMoves
  *  Description: to generate a given state depended on move_type (left, right, up or down), check repeated state and store a generated state to L and S
  */	
 void generatedMoves(State &choice, int input[][5], int output[][5], int nPuzzle, int move_type, int heu_type, int &count){
-	State expand;											 			     
-	copy(expand, choice);
+	State expand(choice);											 			     
 	
-	if(choice.checkMove(move_type)){
-		move(expand, move_type);
-		if(S.find(expand)!=S.end()&&S.find(expand)->depth<=expand.depth) return;
-		else if(S.find(expand)!=S.end()&&S.find(expand)->depth>expand.depth){
-			S.erase(S.find(expand));
+	if(expand.checkMove(move_type)){
+		expand.move(move_type);
+		it = S.find(expand);
+		if(it!=S.end()&&it->depth<=expand.depth) return;
+		else if(it!=S.end()&&it->depth>expand.depth){
+			S.erase(it);
 			switch(heu_type){
 				case 2 : expand.f_function = expand.depth + manhattan_distance(expand.state, output, nPuzzle); break;
 				case 1 : expand.f_function = expand.depth + number_misplace(expand.state, output, nPuzzle); break;
@@ -341,7 +340,7 @@ void generatedMoves(State &choice, int input[][5], int output[][5], int nPuzzle,
 			S.insert(expand);
 			L.push(expand);
 			count++;
-		} else{
+		}else{
 			switch(heu_type){
 				case 2 : expand.f_function = expand.depth + manhattan_distance(expand.state, output, nPuzzle); break;
 				case 1 : expand.f_function = expand.depth + number_misplace(expand.state, output, nPuzzle); break;
@@ -378,16 +377,16 @@ int generator(State &choice, int heu_type, int input[][5], int output[][5], int 
  *  Description: to implement A* algorithm which use input, output and type of heuristic function to compute all of generated states and optimal path cost
  */	
 void A_star(int input[][5], int output[][5], int &optimalMoves, int &generatedStates, int heu_type, int nPuzzle){
-	State in;in.nPuzzle=nPuzzle;in.copyState(input); 															 
-	State out;out.nPuzzle=nPuzzle;out.copyState(output);
+	State in(nPuzzle, input);															 
+	State out(nPuzzle, output);
 	
 	generator(in, heu_type,input, output, nPuzzle);
 	S.insert(in);
 	
 	do{
-		State expand; copy(expand,L.top());
+		State expand(L.top());
 		L.pop();
-		if(checkState(expand, out)){
+		if(expand.checkState(out)){
 			optimalMoves = expand.depth;
 			return;
 		}
@@ -448,13 +447,11 @@ bool ableToSovle(int nPuzzle, int input[][5], int output[][5]){
 					for(int k=0; k<nPuzzle; k++)
 						if(input[h][k]==0){
 							distance = abs(h-i)+abs(k-j);
-							break;
+							m = distance + countP;
+							
+							return (m%2==0);
 						}
 			}
-			
-	m = distance + countP;
-	
-	return (m%2==0);
 }
 /* 
  *  End of function: ableToSovle
