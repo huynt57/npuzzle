@@ -7,7 +7,9 @@
 *
 *   Program: nPuzzle
 *   Desciption: This program uses A-star algorithm to solve nPuzlle problems
-*   with 3 heuristic functions (see below for more details)
+*   with 3 heuristic functions (see below for more details). 
+*	When compile, you should add -Ofast in parameter to optimize speed of 
+*	application
 */
 
 #include <cstdio>
@@ -26,7 +28,7 @@
 #define FOR(i,a,b) for( int i=(a),_b=(b);i<=_b;i++)
 #define DOW(i,b,a) for( int i=(b),_a=(a);i>=_a;i--)
 
-#define maxn 8/* Define the init size of board */
+#define maxn 10/* Define the init size of board */
 
 using namespace std;
 
@@ -433,17 +435,23 @@ bool checkInitAndGoalState() {
  */
 int solve() {
     addInitState();
-    if(checkInitAndGoalState()) {
-	    while (!bestCost.empty()) {
-	        State current = bestCost.top();
-	        bestCost.pop();
-	        if (compareState(current, goalState)) {
-	            return current.g;
-	        } else {
-	            addAllNextState(current);
-	        }
-	    }
-	}
+    long limit_state = 0;
+    if (checkInitAndGoalState()) limit_state = 1000000000;
+    else {
+    	if(size == 3)	limit_state = 250000;
+    	else if(size == 4)	limit_state = 600000;
+    	else if(size >= 4)	limit_state = 1000000;
+    }	
+    while (!bestCost.empty()) {
+        State current = bestCost.top();
+        bestCost.pop();
+        if (compareState(current, goalState)) {
+            return current.g;
+        } else {
+            addAllNextState(current);
+        }
+        if (stateGenerated >= limit_state) return -1; // if state generated over as above, return -1
+    }	
     return -1;
 }
 /*
