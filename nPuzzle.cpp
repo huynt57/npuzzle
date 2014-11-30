@@ -436,11 +436,11 @@ bool checkInitAndGoalState() {
 int solve() {
     addInitState();
     long limit_state = 0;
-    if (checkInitAndGoalState()) limit_state = 1000000000;
+    if (checkInitAndGoalState()) limit_state = 1000000000; //set limit state to solve
     else {
-    	if(size == 3)	limit_state = 250000;
+    	if(size == 3)		limit_state = 250000;
     	else if(size == 4)	limit_state = 600000;
-    	else if(size >= 4)	limit_state = 1000000;
+    	else if(size >= 5)	limit_state = 1000000;
     }	
     while (!bestCost.empty()) {
         State current = bestCost.top();
